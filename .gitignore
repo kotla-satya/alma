@@ -1,0 +1,27 @@
+# Secrets
+.env
+
+# Claude
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Alembic (keep versions tracked, ignore cache)
+alembic/__pycache__/
