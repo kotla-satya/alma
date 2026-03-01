@@ -1,4 +1,119 @@
 
+## Project Structure
+
+```
+Alma/
+├── app/
+│   ├── main.py                        # FastAPI app factory, routers, APScheduler lifespan
+│   ├── config.py                      # Pydantic settings (reads from .env)
+│   ├── database.py                    # Async SQLAlchemy engine + get_db dependency
+│   ├── dependencies/
+│   │   └── auth.py                    # JWT helpers, get_current_user, require_attorney
+│   ├── models/
+│   │   ├── base.py                    # SQLAlchemy DeclarativeBase
+│   │   ├── user.py                    # UserRole, User
+│   │   ├── lead.py                    # LeadState, Lead
+│   │   └── notification.py            # NotificationType, LeadNotification
+│   ├── routers/
+│   │   ├── auth.py                    # POST /auth/login
+│   │   ├── leads.py                   # Lead CRUD + resume download
+│   │   └── users.py                   # POST /user
+│   ├── schemas/
+│   │   ├── lead.py                    # LeadCreate, LeadRead, LeadUpdate
+│   │   └── user.py                    # UserCreate, UserRead, TokenResponse
+│   └── services/
+│       ├── lead_service.py            # Lead business logic
+│       ├── user_service.py            # User business logic
+│       ├── email_service.py           # Resend email sender
+│       └── notification_service.py    # Cron job — processes pending notifications
+├── alembic/
+│   ├── env.py                         # Alembic config (pulls DB URL from settings)
+│   └── versions/                      # Migration files
+├── docs/
+│   ├── Design Doc.md
+│   └── readme.md
+├── scripts/
+│   └── init_db.py                     # Creates tables + seeds roles, states, default attorney
+├── tests/
+│   ├── conftest.py                    # SQLite in-memory fixtures, seeded test DB
+│   └── test_leads.py                  # Lead API + notification service tests
+├── .env.example                       # Environment variable template
+├── .gitignore
+├── alembic.ini
+├── docker-compose.yml                 # app + postgres services
+├── Dockerfile
+├── pytest.ini
+└── requirements.txt
+```
+
+## Database Schema (ERD)
+
+```mermaid
+erDiagram
+    USER_ROLE {
+        string role_id PK "ATTORNEY | PARA_LEGAL | CLERK"
+        string role_name
+        datetime created_at
+        datetime updated_at
+    }
+
+    USER {
+        uuid id PK
+        string name
+        string email UK
+        string hashed_password
+        string user_role_id FK
+        bool is_active
+        datetime created_at
+        datetime updated_at
+        datetime deactivated_at
+    }
+
+    LEAD_STATE {
+        string lead_state_id PK "PENDING | REACHED_OUT"
+        string lead_state_name
+        datetime created_at
+        datetime updated_at
+    }
+
+    LEAD {
+        uuid id PK
+        string first_name
+        string last_name
+        string email_id UK
+        blob resume
+        string resume_filename
+        string lead_state_id FK
+        uuid handled_by_user_id FK
+        string attorney_notes
+        datetime created_at
+        datetime updated_at
+    }
+
+    NOTIFICATION_TYPE {
+        string notification_type_id PK "email_new_lead_submission"
+        string notification_type_name
+    }
+
+    LEAD_NOTIFICATION {
+        uuid id PK
+        uuid lead_id FK
+        string notification_type_id FK
+        bool is_lead_notified
+        bool is_attorney_notified
+        datetime lead_notified_at
+        datetime attorney_notified_at
+        datetime created_at
+        datetime updated_at
+    }
+
+    USER_ROLE ||--o{ USER : "assigned to user_role_id"
+    USER ||--o{ LEAD : "handles"
+    LEAD_STATE ||--o{ LEAD : "state types"
+    LEAD ||--|| LEAD_NOTIFICATION : "triggers"
+    NOTIFICATION_TYPE ||--o{ LEAD_NOTIFICATION : "notification types"
+```
+
 # To run unit tests
  python -m pytest tests/ -v
 
