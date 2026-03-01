@@ -18,14 +18,13 @@ docker compose up -d
 
 # To stop the server
 docker compose down # stop the server, keep the DB
+
 docker-compose down -v       # stop + wipe DB
 
-Once Docker is up and running, 
-Run docker ps to check the status of the containers. you should see the server running
-(.venv) satya Alma % docker ps     
-CONTAINER ID   IMAGE                                             COMMAND                   CREATED          STATUS                    PORTS                                                        NAMES
-08ac1bc53996   alma-app                                          "sh -c 'python scrip…"    23 minutes ago   Up 23 minutes             0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp                  alma-app-1
-1a39e6b6fe65   postgres:16-alpine                                "docker-entrypoint.s…"    23 minutes ago   Up 23 minutes (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp                  alma-db-1
+Once Docker is up and running, Run docker ps to check the status of the containers. you should see the server running
+
+use `docker ps` and see alma-app-1 and alma-db-1 running
+
 
 ## Access Swagger UI
 you can access the API at http://localhost:8000/docs
@@ -39,17 +38,17 @@ Login (get a JWT):
 
 Sample response
 {
-    "access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjJlMzVkNS1jOTQ5LTQ0MjQtOWZmZS0yOWRkNWQxNzlkY2YiLCJyb2xlIjoiQVRUT1JORVkiLCJleHAiOjE3NzIzMjIwNTN9.p2f11PyoYwrBha7fXng1YL47SJdyLz5SkXdVkPsWQWw",
+    "access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
     "token_type":"bearer"
 }   
 
 List leads (requires JWT):
   curl http://localhost:8000/leads/ \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjJlMzVkNS1jOTQ5LTQ0MjQtOWZmZS0yOWRkNWQxNzlkY2YiLCJyb2xlIjoiQVRUT1JORVkiLCJleHAiOjE3NzIzMjIwNTN9.p2f11PyoYwrBha7fXng1YL47SJdyLz5SkXdVkPsWQWw"
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
 
 # Create a lead
   curl -X POST http://localhost:8000/leads/ \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjJlMzVkNS1jOTQ5LTQ0MjQtOWZmZS0yOWRkNWQxNzlkY2YiLCJyb2xlIjoiQVRUT1JORVkiLCJleHAiOjE3NzIzMjIwNTN9.p2f11PyoYwrBha7fXng1YL47SJdyLz5SkXdVkPsWQWw"
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
     -F "first_name=Jane" \
     -F "last_name=Doe" \
     -F "email_id=kotla.satya+7@gmail.com" \

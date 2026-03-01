@@ -11,19 +11,20 @@ Types of personas/users
 
 **Assumptions**
 
-- Lead and Prospect is 1:1
-- Leads can not be updated once submitted
+- Leads and prospect can be same or different persons.  
+- Leads can not be updated once submitted by the prospect
 - Once lead is submitted, all the emails are sent to **same attorney(one fixed instead of dynamic)** and corresponding prospect
 - Attorney **can not** update lead details except the lead state and notes field
 
 **Design choices**
-
+- Email ID of lead should be unique
 - Using Database to store the resume directly in DB, in prod this can be stored in S3 and save reference to it in DB
 - No size restriction on the document upload
 - No rate limiting on lead creation
 - Updates can not be made to lead
 - Resume uploaded can be viewed on demand
 - Default Admin/Attorney user is created using script on setup of the app
+- Cron job is used to send emails to prospect and attorney, in production this can be done async and real time using pub/sub.
 - Based on time permitting
     - support for logging and metrics
     - Attorney/App users CRUD support
@@ -120,7 +121,7 @@ An entry is made in to lead_notifications table on creation of lead with lead id
 - FAST API
 - SQL Alchemy as ORM
 - Alembic for database schema maintenance
-- JWT for auth
+- JWT for auth/authz
 - Docker
 - pytests for unit test using sql lite (based on time permitting)
 - Resend [`resend.com/`](http://resend.com/) - for Email
